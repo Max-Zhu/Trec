@@ -15,7 +15,7 @@ def normalize_twitter(text):
     return text
 
 def tokenize_stemm(text):
-	text = re_pattern.sub('', text)
-	words = nltk.tokenize.word_tokenize(text)
+	text = normalize_twitter(text)
+	words = nltk.regexp_tokenize(text, re_pattern)
 	stem_words = [porter_stemmer.stem_word(word) for word in words if word.lower() not in stopwords]
 	return stem_words
