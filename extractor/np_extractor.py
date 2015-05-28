@@ -60,8 +60,8 @@ input.close()
  
 class NPExtractor(object):
  
-    def __init__(self, sentence):
-        self.sentence = sentence
+    def __init__(self):
+        super(NPExtractor,self).__init__()
  
     # Split the sentence into singlw words/tokens
     def tokenize_sentence(self, sentence):
@@ -114,10 +114,10 @@ class NPExtractor(object):
 
 
     # Extract the main topics from the sentence
-    def extract(self):
+    def extract(self, input_line):
         st=nltk.PorterStemmer()
          
-        tokens = self.tokenize_sentence(self.sentence)
+        tokens = self.tokenize_sentence(input_line)
         #tokens = [st.stem(word) for word in tokens] 
         tags = self.normalize_tags(bigram_tagger.tag(tokens))
  
@@ -140,6 +140,12 @@ class NPExtractor(object):
  
         matches = []
         for t in tags:
+            t[0].replace('  ','')
+            t[0].replace('   ',' ')
+
+            if t[0]==" ":
+                
+
             #if t[1] == "NNP" or t[1] == "NNI" or t[1] == "SURL":
             if t[1] == "NNP" or t[1] == "NNI"  or t[1][:1] == "VB":
             #if t[1] == "NNP" or t[1] == "NNI" or t[1] == "NN" or t[1] == "SURL":
@@ -177,11 +183,12 @@ def main():
     f = open('text_en.txt','rU')
     pass_count = 0
     all_matches = []
+    np_extractor = NPExtractor()
     for line in f:
         try:
             #print text_line.strip()
-            np_extractor = NPExtractor(line.strip())
-            result = np_extractor.extract()
+            
+            result = np_extractor.extract(line.strip())
             all_matches.append(result)
             # output = open('np.txt','a')
             # output.write(str(result))
