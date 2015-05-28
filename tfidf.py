@@ -6,9 +6,9 @@ import logging
 from nltk.corpus import wordnet as wn
 
 all_noun = [lemma.name for synset in wn.all_synsets('n') for lemma in synset.lemmas]
-all_verb = [lemma.name for synset in wn.all_synsets('v') for lemma in synset.lemmas]
+#all_verb = [lemma.name for synset in wn.all_synsets('v') for lemma in synset.lemmas]
 corpus = all_noun
-corpus.extend(all_verb)
+#corpus.extend(all_verb)
 
 stopwords = nltk.corpus.stopwords.words('english')
 stemmer = nltk.stem.PorterStemmer()
@@ -24,21 +24,20 @@ def normalize_twitter(text):
     text = re.sub(r' +(via|live on) *$', '', text)
     return text
 
-def tokenize_stemm(text):
+def preprocess(text):
 	text = normalize_twitter(text)
 	words = [word.lower() for word in nltk.regexp_tokenize(text, re_pattern)]
 	words_stemmed = [stemmer.stem(word) for word in words if word not in stopwords]
 	words_filtered = [word for word in words_stemmed if word in corpus]
 	return words_filtered
 
-def init_model():
-	documents = [line.strip() for line in open('/home/max/Ipython/Workspace/test.txt')]
-	texts = [tokenize_stemm(document) for document in documents]
+def init_model(input_profiles):
+	profiles = [preprocess(profile) for profile in input_profiles]
 	#pprint.pprint(texts)
 	logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 	dictionary = corpora.Dictionary([corpus])
-	docs = [dictionary.doc2bow(text) for text in texts]
+	docs = [dictionary.doc2bow(profile) for profile in profiles]
 	tfidf = models.TfidfModel(docs)
 
 	docs_tfidf = tfidf[docs]
@@ -48,12 +47,13 @@ def init_model():
 	return dictionary, tfidf
 
 def tfidf_test():
+	profiles = loadProfile(sys.argv[1])
 	dictionary, tfidf = init_model()
 	index = similarities.SparseMatrixSimilarity.load('./profiles.index')
 
-	query = tokenize_stemm("@sIeepingpiIls I love it I can wait for spring break")
-	query_vec = dictionary.doc2bow(query)
-	sims = index[tfidf[query_vec]]
-	
-	result = sorted(enumerate(sims), key=lambda item: -item[1])
-	pprint.pprint(result)
+	for tweet in sys.stdin:
+	    query = tokenize_stemm(tweet)
+	    query_vec = dictionary.doc2bow(query)
+	    sims = index[tfidf[query_vec]]
+	    result = sorted(enumerate(sims), key=lambda item: -item[1])
+	    pprint.pprint(result)
