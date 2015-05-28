@@ -228,22 +228,37 @@ def extract_text(line):
     if line[0] == '{':
         tweet = json.loads(line)
         if tweet.has_key('created_at') and tweet['user']['lang'] == 'en':
-            text = tweet['user']['lang'] + '\t' +re_filtUrl.sub(' ', tweet['text']).strip()
+            text = re_filtUrl.sub(' ', tweet['text']).strip()
     return text
 
 if __name__ == '__main__':
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
-    fw = open("en_tweets", 'w')
+    fw = open("en_tweets.txt", 'w')
 
     model = os.path.join(sys.path[0], 'model.latin')
     detector = ldig(model)
-
     param, labels, trie = detector.load_params()
 
     for line in fileinput.input():
         text = extract_text(line)
         if text != "":
-            lang = predict_lang(param, labels, trie, text)
+            lang = predict_lang(param, labels, trie, 'en\t' + text)
             if lang == 'en':
                 fw.write(line)
                 print text
+#========================================== 
+    '''
+    file_path = sys.argv[1]
+    filelist = os.listdir(file_path)
+
+    for file in filelist:
+        fr = codecs.open(os.path.join(file_path, file), 'rb', 'utf-8')
+        for i, line in enumerate(fr):
+            text = extract_text(line)
+            if text != "":
+                lang = predict_lang(param, labels, trie, 'en\t' + text)
+                if lang == 'en':
+                    fw.write(line)
+                    print text
+        fr.close()
+    '''
