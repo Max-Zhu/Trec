@@ -140,10 +140,11 @@ class NPExtractor(object):
  
         matches = []
         for t in tags:
+            t = list(t)
             t[0]=t[0].replace('  ','')
             t[0]=t[0].replace('   ',' ')
-
-            if t[0]==" ":
+            t= tuple(t)
+            # if t[0]==" ":
 
 
             #if t[1] == "NNP" or t[1] == "NNI" or t[1] == "SURL":
