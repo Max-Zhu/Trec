@@ -48,8 +48,8 @@ bigram_tagger = nltk.BigramTagger(brown_train, backoff=unigram_tagger)
 cfg = {}
 cfg["NNP+NNP"] = "NNP"
 cfg["NN+NN"] = "NNI"
-cfg["NNI+NN"] = "NNI"
-cfg["JJ+JJ"] = "JJ"
+# cfg["NNI+NN"] = "NNI"
+# cfg["JJ+JJ"] = "JJ"
 cfg["JJ+NN"] = "NNI"
 cfg["DT+NN"] = "NNT"
 cfg["AT+NN"] = "NNT"
@@ -140,11 +140,11 @@ class NPExtractor(object):
  
         matches = []
         for t in tags:
-            t[0].replace('  ','')
-            t[0].replace('   ',' ')
+            t[0]=t[0].replace('  ','')
+            t[0]=t[0].replace('   ',' ')
 
             if t[0]==" ":
-                
+
 
             #if t[1] == "NNP" or t[1] == "NNI" or t[1] == "SURL":
             if t[1] == "NNP" or t[1] == "NNI"  or t[1][:1] == "VB":
